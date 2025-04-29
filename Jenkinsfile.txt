@@ -3,7 +3,7 @@ pipeline {
 
     environment {
         DOCKER_HUB = credentials('docker-hub-credentials')
-        IMAGE_NAME = 'your-dockerhub-username/datetime-app'
+        IMAGE_NAME = 'bibek87/datetime-app'
         VERSION = "${env.BUILD_ID}"
     }
 
@@ -11,7 +11,7 @@ pipeline {
         stage('Checkout') {
             steps {
                 git branch: 'main', 
-                url: 'https://github.com/your-username/your-repo.git'
+                url: 'https://github.com/tba87/datetime-app.git'
             }
         }
 
