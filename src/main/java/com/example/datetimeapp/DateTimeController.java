@@ -1,9 +1,9 @@
-package com.example.datetime_app;
-import java.time.LocalDateTime;
+package com.example.datetimeapp;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import java.time.LocalDateTime;
 
 @Controller
 public class DateTimeController {
@@ -13,3 +13,4 @@ public class DateTimeController {
         return "datetime";
     }
 }
+

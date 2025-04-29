@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Current Date and Time</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        .datetime-container {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 1.5rem;
+            font-weight: 600;
+        }
+        .datetime {
+            font-size: 1.5rem;
+            color: #007bff;
+            font-weight: bold;
+            padding: 1rem;
+            background: #f8f9fa;
+            border-radius: 5px;
+            border-left: 5px solid #007bff;
+        }
+    </style>
+</head>
+<body>
+    <div class="datetime-container">
+        <h1>Current Date and Time</h1>
+        <div class="datetime" th:text="${currentDateTime}"></div>
+    </div>
+</body>
+</html>
