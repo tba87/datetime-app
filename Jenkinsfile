@@ -1,14 +1,8 @@
 pipeline {
     agent any
 
-    environment {
-        DOCKER_HUB = credentials('docker-hub-credentials')
-        IMAGE_NAME = 'bibek87/datetime-app'
-        VERSION = "${env.BUILD_ID}"
-    }
-
     stages {
-        stage('Checkout') {
+        stage('Checkout Code') {
             steps {
                 git branch: 'main', 
                 url: 'https://github.com/tba87/datetime-app.git'
@@ -21,41 +15,22 @@ pipeline {
             }
         }
 
-        stage('Test') {
+        stage('Build and Run Docker Container') {
             steps {
-                sh 'mvn test'
-            }
-        }
-
-        stage('Build Docker Image') {
-            steps {
-                script {
-                    docker.build("${IMAGE_NAME}:${VERSION}")
+               script {
+                        // Stop and remove existing container if running
+                        sh 'docker stop datetime-app || true'
+                        sh 'docker rm datetime-app || true'
+            
+                        // Remove existing image if exists
+                        sh 'docker rmi datetime-image || true'
+            
+                        // Build new image
+                        sh 'docker build -t datetime-image .'
+            
+                        // Run new container with port mapping 9090:8080
+                        sh 'docker run -d -p 9090:8080 --name datetime-app datetime-image'
                 }
-            }
-        }
-
-        stage('Push to Docker Hub') {
-            steps {
-                script {
-                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
-                        docker.image("${IMAGE_NAME}:${VERSION}").push()
-                        docker.image("${IMAGE_NAME}:latest").push()
-                    }
-                }
-            }
-        }
-
-        stage('Deploy') {
-            steps {
-                sh '''
-                docker stop datetime-app || true
-                docker rm datetime-app || true
-                docker run -d \
-                    -p 8080:8080 \
-                    --name datetime-app \
-                    ${IMAGE_NAME}:${VERSION}
-                '''
             }
         }
     }
@@ -65,10 +40,7 @@ pipeline {
             cleanWs()
         }
         success {
-            slackSend color: 'good', message: "Build ${env.BUILD_URL} succeeded"
-        }
-        failure {
-            slackSend color: 'danger', message: "Build ${env.BUILD_URL} failed"
+            echo 'Application is running at http://<your-server-ip>:9090'
         }
     }
 }
