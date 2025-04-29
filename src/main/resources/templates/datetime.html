@@ -42,5 +42,28 @@
         <h1>Current Date and Time</h1>
         <div class="datetime" th:text="${currentDateTime}"></div>
     </div>
+    <script>
+        function updateTime() {
+            fetch('/current-time')
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error('Network response was not ok');
+                    }
+                    return response.text();
+                })
+                .then(time => {
+                    document.querySelector('.datetime').textContent = time;
+                })
+                .catch(error => {
+                    console.error('Error fetching time:', error);
+                    document.querySelector('.datetime').textContent = "Error loading time";
+                });
+        }
+        
+        // Initial update
+        updateTime();
+        // Update every second
+        setInterval(updateTime, 1000);
+    </script>
 </body>
 </html>
