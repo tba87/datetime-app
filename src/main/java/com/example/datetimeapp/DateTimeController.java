@@ -1,23 +1,27 @@
 package com.example.datetimeapp;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 public class DateTimeController {
-    @GetMapping("/")
-    public String showDateTime(Model model) {
-        model.addAttribute("currentDateTime", LocalDateTime.now());
-        return "datetime";
-    }
-    @GetMapping("/current-time")
-    @ResponseBody
-    public String getCurrentTime() {
-        return LocalDateTime.now().toString();
-    }
+    private static final DateTimeFormatter dateFormatter = 
+        DateTimeFormatter.ofPattern("EEEE, MMMM dd, yyyy");
+    private static final DateTimeFormatter timeFormatter = 
+        DateTimeFormatter.ofPattern("hh:mm:ss a");
+        
+        @GetMapping("/api/current-datetime")
+        public Map<String, String> getCurrentDateTime() {
+            LocalDateTime now = LocalDateTime.now();
+            Map<String, String> datetime = new HashMap<>();
+            datetime.put("date", now.format(dateFormatter));
+            datetime.put("time", now.format(timeFormatter));
+            return datetime;
+        }
 }
 
