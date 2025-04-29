@@ -1,0 +1,74 @@
+pipeline {
+    agent any
+
+    environment {
+        DOCKER_HUB = credentials('docker-hub-credentials')
+        IMAGE_NAME = 'your-dockerhub-username/datetime-app'
+        VERSION = "${env.BUILD_ID}"
+    }
+
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'main', 
+                url: 'https://github.com/your-username/your-repo.git'
+            }
+        }
+
+        stage('Build with Maven') {
+            steps {
+                sh 'mvn clean package'
+            }
+        }
+
+        stage('Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                script {
+                    docker.build("${IMAGE_NAME}:${VERSION}")
+                }
+            }
+        }
+
+        stage('Push to Docker Hub') {
+            steps {
+                script {
+                    docker.withRegistry('https://registry.hub.docker.com', 'docker-hub-credentials') {
+                        docker.image("${IMAGE_NAME}:${VERSION}").push()
+                        docker.image("${IMAGE_NAME}:latest").push()
+                    }
+                }
+            }
+        }
+
+        stage('Deploy') {
+            steps {
+                sh '''
+                docker stop datetime-app || true
+                docker rm datetime-app || true
+                docker run -d \
+                    -p 8080:8080 \
+                    --name datetime-app \
+                    ${IMAGE_NAME}:${VERSION}
+                '''
+            }
+        }
+    }
+
+    post {
+        always {
+            cleanWs()
+        }
+        success {
+            slackSend color: 'good', message: "Build ${env.BUILD_URL} succeeded"
+        }
+        failure {
+            slackSend color: 'danger', message: "Build ${env.BUILD_URL} failed"
+        }
+    }
+}
