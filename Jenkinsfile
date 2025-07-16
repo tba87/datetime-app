@@ -1,6 +1,10 @@
 pipeline {
     agent any
 
+    tools {
+        jdk 'jdk17' // Use the name you gave in Global Tool Configuration
+    }
+
     stages {
         stage('Checkout Code') {
             steps {
