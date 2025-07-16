@@ -1,22 +1,21 @@
-# Use the latest stable Maven with OpenJDK 17 for the build stage
-FROM maven:3.9.6-openjdk-17 AS build # Updated Maven version
+# Build stage
+# CORRECTED: Use a valid Maven image tag that includes OpenJDK 17
+FROM maven:3.9.6-eclipse-temurin-17-alpine AS build
 WORKDIR /app
 COPY pom.xml .
 RUN mvn dependency:go-offline
 
 # Copy source and build the JAR.
-# Keep -DskipTests if you still want to bypass test execution during Docker build.
-# If tests are fixed, remove -DskipTests to ensure tests run during image build.
+# Keep -DskipTests for now as your tests are failing
 COPY src ./src
 RUN mvn package -DskipTests
 
 # Run stage
-# Using a slim JDK for the final image to keep it small
+# This part looks correct. openjdk:17-jdk-slim is a valid image.
 FROM openjdk:17-jdk-slim
 WORKDIR /app
 
 # Copy the built JAR from the build stage
-# The wildcard is generally fine here for single-module projects
 COPY --from=build /app/target/*.jar app.jar
 
 # Expose the port that your Spring Boot application will run on
